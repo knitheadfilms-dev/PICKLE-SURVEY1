@@ -72,7 +72,12 @@
   }
 
   @media (max-width: 640px) {
-    #cf-root { align-items: flex-start; padding-top: 40px; }
+    #cf-root { 
+      display: flex !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      min-height: 100vh !important; 
+    }
     .cf-wrap { border-radius: 16px; padding: 24px 20px; }
     .cf-mango { transform: scale(0.6); }
   }
@@ -204,7 +209,7 @@
 
   const mangoHost = document.getElementById('cf-mangoes');
   const mangoSpecs = [
-    { corner:'tl', size:96,  inset:18, dur:'9s',  delay:'0s'   },
+    { corner:'tl', size:96,  inset:18, dur:'9s',  delay:'0s'    },
     { corner:'tr', size:104, inset:16, dur:'10s', delay:'.8s'  },
     { corner:'bl', size:88,  inset:20, dur:'11s', delay:'1.6s' },
     { corner:'br', size:80,  inset:22, dur:'8s',  delay:'2.2s' }
