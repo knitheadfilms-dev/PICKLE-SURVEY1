@@ -20,10 +20,10 @@
     --ink:#2F2418;
     --muted:#8A7154;
     --gold:#D4A33A;
-}
+  }
 
   *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; background:var(--cream-bg); }
+  html,body{ margin:0; padding:0; background:var(--cream-bg); min-height:100%; }
   #cf-root{
     position:relative;
     min-height:100vh;
@@ -35,11 +35,11 @@
     animation:cf-bg-shift 24s ease-in-out infinite;
     color:var(--ink);
     font-family:'Inter',sans-serif;
-    overflow:auto;
-    padding:0;
+    padding:20px;
     display:flex;
     align-items:center;
     justify-content:center;
+    overflow:hidden;
   }
   @keyframes cf-bg-shift{
     0%,100%{ background-position:0% 20%, 100% 80%, 0% 30%; }
@@ -51,6 +51,7 @@
     animation:cf-mango-float ease-in-out infinite;
     opacity:.62;
     filter:drop-shadow(0 10px 18px rgba(122,46,28,.20));
+    pointer-events: none;
   }
   @keyframes cf-mango-float{
     0%,100%{ transform:translateY(0) rotate(-3deg); }
@@ -62,7 +63,6 @@
     z-index:2;
     width:100%;
     max-width:440px;
-    margin:24px auto;
     padding:32px 32px 28px;
     background:var(--cream-card);
     border-radius:22px;
@@ -70,26 +70,11 @@
       0 0 0 1px rgba(255,122,41,.09), inset 0 0 0 5px rgba(255,122,41,.045);
     border:1px solid rgba(255,122,41,.10);
   }
-@media (max-width: 640px) {
-    #cf-root {
-      display: block !important;
-      overflow: auto !important;
-      padding: 0;
-    }
-    .cf-wrap { 
-      margin: 0 !important; 
-      border-radius: 0 !important; 
-      min-height: 100vh !important; 
-      width: 100% !important;
-      max-width: none !important;
-      padding: 24px 18px 20px !important; 
-      box-shadow: none !important; 
-      background: var(--cream-card) !important;
-    }
-    
-    .cf-mango {
-      display: block !important;
-    }
+
+  @media (max-width: 640px) {
+    #cf-root { align-items: flex-start; padding-top: 40px; }
+    .cf-wrap { border-radius: 16px; padding: 24px 20px; }
+    .cf-mango { transform: scale(0.6); }
   }
 
   .cf-progress{ width:100%; height:56px; margin-bottom:36px; }
@@ -133,7 +118,7 @@
   .cf-chips{ display:flex; flex-wrap:wrap; gap:10px; }
   .cf-chip{
     padding:10px 16px; border-radius:999px;
-    border:1.5px solid var(--navy-line); background:transparent;
+    border:1.5px solid rgba(232,89,12,.22); background:transparent;
     color:var(--ink); font-size:14px; cursor:pointer;
     transition:all .2s ease;
   }
@@ -142,7 +127,7 @@
   }
 
   .cf-field{
-    width:100%; background:#FAF2E5; border:1.5px solid var(--navy-line);
+    width:100%; background:#FAF2E5; border:1.5px solid rgba(232,89,12,.22);
     border-radius:12px; padding:14px 16px; color:var(--ink);
     font-family:'Inter',sans-serif; font-size:15px; resize:none;
     transition:border-color .2s ease;
@@ -174,7 +159,7 @@
 
   .cf-canvas-wrap{ display:flex; justify-content:center; margin:8px 0 24px; }
 
-  .cf-recap{ text-align:left; background:#FAF2E5; border:1px solid var(--navy-line);
+  .cf-recap{ text-align:left; background:#FAF2E5; border:1px solid rgba(232,89,12,.22);
     border-radius:12px; padding:18px 20px; margin-bottom:24px; }
   .cf-recap div{ font-size:13px; color:var(--muted); margin-bottom:6px; }
   .cf-recap div:last-child{ margin-bottom:0; }
@@ -237,7 +222,6 @@
     mangoHost.appendChild(el);
   });
 
-  // name and age are now separate steps like all other questions
   const steps = ['welcome','nameStep','ageStep','mangoLike','brand','decider','homeAway','spend','frequency','online','tryPremium','final'];
   const progressSteps = ['nameStep','ageStep','mangoLike','brand','decider','homeAway','spend','frequency','online','tryPremium'];
   let stepIndex = 0;
