@@ -116,31 +116,6 @@
   }
   .cf-sub{ color:var(--muted); font-size:14px; margin:0 0 28px; }
 
-  .cf-stars{ display:flex; gap:14px; margin-bottom:8px; }
-  .cf-star-btn{
-    background:none; border:none; cursor:pointer; padding:4px;
-    color:var(--navy-line);
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), color .25s ease;
-  }
-  .cf-star-btn svg{ width:38px; height:38px; display:block; }
-  .cf-star-btn.lit{ color:var(--gold); transform:scale(1.12) rotate(-6deg); }
-  .cf-star-btn:hover{ transform:scale(1.15); }
-
-  .cf-nps{ display:flex; gap:8px; flex-wrap:wrap; }
-  .cf-nps button{
-    width:44px; height:44px; border-radius:50%;
-    border:1.5px solid var(--navy-line);
-    background:transparent; color:var(--ink);
-    font-family:'IBM Plex Mono',monospace; font-size:14px;
-    cursor:pointer; transition:all .25s ease;
-  }
-  .cf-nps button.sel{
-    background:var(--violet); border-color:var(--violet); color:#0A0F1E;
-    box-shadow:0 0 0 4px rgba(139,127,214,.25);
-    transform:scale(1.08);
-  }
-  .cf-nps-labels{ display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:10px; }
-
   .cf-chips{ display:flex; flex-wrap:wrap; gap:10px; }
   .cf-chip{
     padding:10px 16px; border-radius:999px;
@@ -192,10 +167,6 @@
   .cf-recap b{ color:var(--ink); font-weight:600; }
 
   .cf-tiny{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); text-align:center; margin-top:18px; }
-
-  .cf-age-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
-  .cf-welcome-field{ text-align:left; margin-bottom:20px; }
-  .cf-welcome-label{ font-size:12px; font-weight:700; color:#9C7A4A; letter-spacing:0.1em; text-transform:uppercase; display:block; margin-bottom:8px; }
 </style>
 
 <div id="cf-root">
@@ -252,8 +223,9 @@
     mangoHost.appendChild(el);
   });
 
-  const steps = ['welcome','mangoLike','brand','decider','homeAway','spend','frequency','online','tryPremium','final'];
-  const progressSteps = ['mangoLike','brand','decider','homeAway','spend','frequency','online','tryPremium'];
+  // name and age are now separate steps like all other questions
+  const steps = ['welcome','nameStep','ageStep','mangoLike','brand','decider','homeAway','spend','frequency','online','tryPremium','final'];
+  const progressSteps = ['nameStep','ageStep','mangoLike','brand','decider','homeAway','spend','frequency','online','tryPremium'];
   let stepIndex = 0;
 
   const answers = {
@@ -273,7 +245,6 @@
   const progressSvg = document.getElementById('cf-progress-svg');
 
   function currentStepName(){ return steps[stepIndex]; }
-
   function esc(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
   function renderProgress(){
@@ -307,7 +278,8 @@
 
   function canAdvance(){
     switch(currentStepName()){
-      case 'welcome': return answers.name.trim().length > 0 && answers.age !== null;
+      case 'nameStep': return answers.name.trim().length > 0;
+      case 'ageStep': return answers.age !== null;
       case 'mangoLike': return answers.mangoLike !== null;
       case 'brand': return answers.brand !== null && (answers.brand !== 'Other' || answers.brandOther.trim().length>0);
       case 'decider': return answers.decider !== null;
@@ -331,57 +303,59 @@
           <div class="cf-eyebrow">Mango Pickle Survey · 2 minutes</div>
           <h1>Help us map<br>India's pickle jar.</h1>
           <p>Eight quick questions about how your household buys and eats mango pickle. Every answer lights a star on your own pickle profile.</p>
-
-          <div class="cf-welcome-field">
-            <label class="cf-welcome-label">Your Name</label>
-            <input
-              id="cf-name-input"
-              class="cf-field"
-              placeholder="Enter your name"
-              value="${answers.name}"
-              oninput="cfApp.setName(this.value)"
-            />
-          </div>
-
-          <div class="cf-welcome-field">
-            <label class="cf-welcome-label">Your Age Group</label>
-            <div class="cf-age-grid">
-              ${ageOptions.map(a=>`
-                <button class="cf-chip ${answers.age===a?'sel':''}" onclick="cfApp.setAge('${esc(a)}')">${a}</button>
-              `).join('')}
-            </div>
-          </div>
-
-          <button class="cf-btn cf-btn-primary" id="cf-begin-btn" onclick="cfApp.go(1)" ${(!answers.name.trim()||!answers.age)?'disabled':''}>Begin →</button>
+          <button class="cf-btn cf-btn-primary" onclick="cfApp.go(1)">Begin →</button>
         </div>`;
+    }
+    else if(name === 'nameStep'){
+      html = `
+        <div class="cf-step">
+          <div class="cf-eyebrow">01 · About you</div>
+          <h2 class="cf-q">What's your name?</h2>
+          <p class="cf-sub">Just your first name is fine.</p>
+          <input
+            class="cf-field"
+            placeholder="Enter your name"
+            value="${answers.name}"
+            oninput="cfApp.setName(this.value)"
+            autofocus
+          />
+          <div class="cf-nav">
+            <button class="cf-btn cf-btn-ghost" onclick="cfApp.go(-1)">Back</button>
+            <button class="cf-btn cf-btn-primary" id="cf-next-btn" onclick="cfApp.go(1)" ${!answers.name.trim()?'disabled':''}>Next →</button>
+          </div>
+        </div>`;
+    }
+    else if(name === 'ageStep'){
+      let chips = ageOptions.map(a=>`<button class="cf-chip ${answers.age===a?'sel':''}" onclick="cfApp.setSingle('age','${esc(a)}')">${a}</button>`).join('');
+      html = questionShell('02','About you','How old are you?','', `<div class="cf-chips">${chips}</div>`, true);
     }
     else if(name === 'mangoLike'){
       const opts = ['Love it','It\'s okay','Not really'];
       let chips = opts.map(o=>`<button class="cf-chip ${answers.mangoLike===o?'sel':''}" onclick="cfApp.setSingle('mangoLike','${esc(o)}')">${o}</button>`).join('');
-      html = questionShell('01','The basics','Do you like mango pickle?','', `<div class="cf-chips">${chips}</div>`, true);
+      html = questionShell('03','The basics','Do you like mango pickle?','', `<div class="cf-chips">${chips}</div>`, true);
     }
     else if(name === 'brand'){
       let chips = brandOptions.map(o=>`<button class="cf-chip ${answers.brand===o?'sel':''}" onclick="cfApp.setSingle('brand','${esc(o)}')">${o}</button>`).join('');
       const otherField = answers.brand === 'Other'
         ? `<input class="cf-field" style="margin-top:14px" placeholder="Which brand?" value="${answers.brandOther}" oninput="cfApp.setBrandOther(this.value)"/>` : '';
-      html = questionShell('02','Purchase','Which pickle brand do you usually buy?','', `<div class="cf-chips">${chips}</div>${otherField}`, true);
+      html = questionShell('04','Purchase','Which pickle brand do you usually buy?','', `<div class="cf-chips">${chips}</div>${otherField}`, true);
     }
     else if(name === 'decider'){
       let chips = deciderOptions.map(o=>`<button class="cf-chip ${answers.decider===o?'sel':''}" onclick="cfApp.setSingle('decider','${esc(o)}')">${o}</button>`).join('');
-      html = questionShell('03','At home','Who decides which pickle to buy at home?','', `<div class="cf-chips">${chips}</div>`, true);
+      html = questionShell('05','At home','Who decides which pickle to buy at home?','', `<div class="cf-chips">${chips}</div>`, true);
     }
     else if(name === 'homeAway'){
       const opts = ['At Home','Away from Home'];
       let chips = opts.map(o=>`<button class="cf-chip ${answers.homeAway===o?'sel':''}" onclick="cfApp.setSingle('homeAway','${esc(o)}')">${o}</button>`).join('');
-      html = questionShell('04','Living situation','Do you currently live at home, or away from home?','', `<div class="cf-chips">${chips}</div>`, true);
+      html = questionShell('06','Living situation','Do you currently live at home, or away from home?','', `<div class="cf-chips">${chips}</div>`, true);
     }
     else if(name === 'spend'){
       let chips = spendOptions.map(o=>`<button class="cf-chip ${answers.spend===o?'sel':''}" onclick="cfApp.setSingle('spend','${esc(o)}')">${o}</button>`).join('');
-      html = questionShell('05','Spend','How much do you typically spend on pickle?','Per jar or per month, whichever feels right.', `<div class="cf-chips">${chips}</div>`, true);
+      html = questionShell('07','Spend','How much do you typically spend on pickle?','Per jar or per month, whichever feels right.', `<div class="cf-chips">${chips}</div>`, true);
     }
     else if(name === 'frequency'){
       let chips = freqOptions.map(o=>`<button class="cf-chip ${answers.frequency===o?'sel':''}" onclick="cfApp.setSingle('frequency','${esc(o)}')">${o}</button>`).join('');
-      html = questionShell('06','Habit','How often do you buy pickle?','', `<div class="cf-chips">${chips}</div>`, true);
+      html = questionShell('08','Habit','How often do you buy pickle?','', `<div class="cf-chips">${chips}</div>`, true);
     }
     else if(name === 'online'){
       const opts = ['Yes','No'];
@@ -391,14 +365,14 @@
         let whereChips = whereOptions.map(o=>`<button class="cf-chip ${answers.onlineWhere===o?'sel':''}" onclick="cfApp.setSingle('onlineWhere','${esc(o)}')">${o}</button>`).join('');
         whereBlock = `<p class="cf-sub" style="margin-top:20px;">If not online, where from?</p><div class="cf-chips">${whereChips}</div>`;
       }
-      html = questionShell('07','Channel','Do you buy pickle online?','', `<div class="cf-chips">${chips}</div>${whereBlock}`, true);
+      html = questionShell('09','Channel','Do you buy pickle online?','', `<div class="cf-chips">${chips}</div>${whereBlock}`, true);
     }
     else if(name === 'tryPremium'){
       const opts = ['Yes, definitely','Maybe','Not interested'];
       let chips = opts.map(o=>`<button class="cf-chip ${answers.tryPremium===o?'sel':''}" onclick="cfApp.setSingle('tryPremium','${esc(o)}')">${o}</button>`).join('');
       html = `
         <div class="cf-step">
-          <div class="cf-eyebrow">08 · Last one</div>
+          <div class="cf-eyebrow">10 · Last one</div>
           <h2 class="cf-q">Would you try a homemade premium mango pickle?</h2>
           <p class="cf-sub">&nbsp;</p>
           <div class="cf-chips">${chips}</div>
@@ -443,13 +417,13 @@
   }
 
   function updateNextState(){
-    const btn = document.getElementById('cf-next-btn') || document.getElementById('cf-begin-btn');
+    const btn = document.getElementById('cf-next-btn');
     if(btn) btn.disabled = !canAdvance();
   }
 
   function drawFinal(){
     const svg = document.getElementById('cf-final-svg');
-    const seedParts = [answers.mangoLike, answers.brand, answers.decider, answers.homeAway,
+    const seedParts = [answers.name, answers.age, answers.mangoLike, answers.brand, answers.decider, answers.homeAway,
       answers.spend, answers.frequency, answers.online, answers.tryPremium];
     let seed = 17;
     seedParts.forEach((s,i)=>{ if(s){ for(let c=0;c<s.length;c++) seed += s.charCodeAt(c)*(i+2); } });
@@ -497,7 +471,6 @@
     setBrandOther(v){ answers.brandOther = v; updateNextState(); },
     setOnline(v){ answers.online = v; if(v==='Yes') answers.onlineWhere = null; render(); },
     setName(v){ answers.name = v; updateNextState(); },
-    setAge(v){ answers.age = v; render(); },
     submit(){
       const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbw1jstfHJsXS50a0aW5snkaxOXEQFSmkH5yokgkag_KGnM002zcIozxRwD2hUIEkw4GQQ/exec';
       if(ENDPOINT_URL){
