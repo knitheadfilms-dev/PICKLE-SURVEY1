@@ -70,14 +70,23 @@
       0 0 0 1px rgba(255,122,41,.09), inset 0 0 0 5px rgba(255,122,41,.045);
     border:1px solid rgba(255,122,41,.10);
   }
-  @media (max-width:640px){
-    .cf-wrap{ 
-        margin:0; 
-        border-radius:0; 
-        min-height:100vh; 
-        padding:24px 18px 20px; 
-        box-shadow:none; 
-        background: var(--cream-card); /* Ensures card color is visible */
+ @media (max-width:640px){
+    .cf-wrap { 
+      margin: 0; 
+      border-radius: 0; 
+      min-height: 100vh; 
+      padding: 24px 18px 20px; 
+      box-shadow: none; 
+      background: var(--cream-card); /* Keeps the card white */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    /* Ensure the body or main container holds the background too */
+    #cf-root {
+      background: var(--cream-bg); /* Use the cream background instead of the gradient on mobile */
+      display: block;
+    }
     }
   }
 
@@ -304,7 +313,7 @@
       html = `
         <div class="cf-step cf-center">
           <div class="cf-eyebrow">Mango Pickle Survey · 1 minute</div>
-          <h1 style="white-space: nowrap;">How Do You Take Your Pickle?</h1>
+          <h1 size=14>How Do You Take Your Pickle?</h1>
           <p>Take 1 minute to tell us your pickle preferences.</p>
           <button class="cf-btn cf-btn-primary" onclick="cfApp.go(1)">Begin →</button>
         </div>`;
