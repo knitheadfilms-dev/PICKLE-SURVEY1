@@ -468,7 +468,7 @@
     setOnline(v){ answers.online = v; if(v==='Yes') answers.onlineWhere = null; render(); },
     setName(v){ answers.name = v; updateNextState(); },
     submit(){
-      const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbw1jstfHJsXS50a0aW5snkaxOXEQFSmkH5yokgkag_KGnM002zcIozxRwD2hUIEkw4GQQ/exec';
+      const ENDPOINT_URL ='https://script.google.com/macros/s/AKfycbzv0KcUrJ7kpGllCq_CaNKfuYevoS-Z378NcBwYNJmjzkmmrayfT2SeWQbgaAkqp8FkwA/exec';
       if(ENDPOINT_URL){
         fetch(ENDPOINT_URL, {
           method:'POST',
